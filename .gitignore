@@ -1,0 +1,19 @@
+node_modules/
+.env
+.env.local
+.env*.local
+
+# Foundary audit logs (local only)
+.foundary/audit/
+.foundary/context-*.json
+.foundary/state-*.json
+
+# Foundary tool artifacts (local only)
+.context7-session.json
+.impeccable-audit.md
+.uiux-pro-max-review.md
+
+# Build outputs
+.next/
+dist/
+build/
