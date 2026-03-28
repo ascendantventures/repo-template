@@ -110,6 +110,52 @@ PLAN → IMPLEMENT → VERIFY → REVIEW → DEPLOY
 - **No debug code in production** — console.log, debugger, etc. blocked at review
 - **Tamper-evident audit** — every gate decision is hash-chained and logged
 
+
+## Team Mode (--team)
+
+For complex tasks that benefit from parallel agent work, use `--team` to spawn a Claude Code Agent Team governed by Foundary:
+
+```bash
+foundary run --task '{"description": "Add rate limiting to API", "taskId": "issue-42"}' --team
+```
+
+### How It Works
+
+1. **Setup** — Foundary writes `.claude/settings.json` with hooks wired to gate scripts
+2. **Team lead spawns agents** — A Planner and a Builder work in parallel
+3. **Gates fire automatically** — When a task is marked complete, the `TaskCompleted` hook runs the matching Foundary station gate
+4. **Blocked = task not done** — Exit 2 from the gate sends feedback to the teammate to fix before completion
+5. **Deterministic tail** — After the team finishes 01-plan and 02-implement, stations 03-verify, 04-review, 05-deploy run normally
+
+### Hook Architecture
+
+| Hook | Purpose |
+|------|---------|
+| `TaskCompleted` | Maps task title → station, runs gate script. Blocks on exit 2. |
+| `TeammateIdle` | Logs idle events to `.foundary/audit/<taskId>.jsonl` |
+| `PreToolUse` | Blocks dangerous bash (push to main, rm -rf on critical paths) |
+
+### Task Title → Station Mapping
+
+| Task title contains | Station |
+|---------------------|---------|
+| "plan" | `01-plan` |
+| "implement" or "build" | `02-implement` |
+| "verify" or "test" | `03-verify` |
+| "review" | `04-review` |
+
+### Team Structure
+
+The team lead receives a prompt directing it to:
+1. Spawn a **Planner** to write `.superpowers/plans/<taskId>.md`
+2. Spawn a **Builder** to implement (reads `.foundary/scope-constraint.md`, creates tool artifacts)
+3. Gate scripts enforce all the same requirements as normal pipeline mode
+
+### When to Use Team Mode vs Dispatch Mode
+
+- **`--team`** — Multi-agent parallel work with task-level gating. Best for large features.
+- **`--dispatch`** — Single-agent sequential stations. Best for focused tasks.
+
 ## If Something Goes Wrong
 
 If a station blocks you:
