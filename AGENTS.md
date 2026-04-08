@@ -65,29 +65,6 @@ using-superpowers (session start)
 
 ---
 
-## ⚠️ BEFORE ANY CODE CHANGE — MANDATORY
-
-Read `.foundary/SKILL.md`. Then run:
-
-```bash
-foundary run --task '{"description": "...", "taskId": "issue-N", "allowedFiles": ["src/**"]}'
-```
-
-**NO direct `git commit`. NO exceptions.** The pre-commit hook will hard-block you. If you committed outside Foundary, stop and redo it through the pipeline.
-
-Emergency human override only: `FOUNDARY_ADMIN=1 git commit` (logged to audit trail).
-
-## Governed SDLC — Foundary Pipeline
-
-All coding tasks run through the Foundary governed pipeline. This is non-negotiable.
-
-Stations: **plan → implement → verify → review → deploy**
-
-- You work freely inside each station using all your normal tools
-- The station gates validate your output — they cannot be bypassed
-- If a gate blocks you: fix the issue, re-run with `--resume <station>`
-- The audit trail is hash-chained and logged to `.foundary/audit/`
-
 ## Issue-Driven SDLC
 
 - One issue = one branch = one PR
